@@ -1,106 +1,174 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="stylesheet" href="css/leaflet.css">
-        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
-        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
-        <link rel="stylesheet" href="css/qgis2web.css">
-        <link rel="stylesheet" href="css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="css/leaflet-measure.css">
-        <style>
-        html, body, #map {
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>HHRWS Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,width=device-width">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="css/leaflet-measure.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+    <script src="js/proj4.js"></script>
+    <script src="js/proj4leaflet.js"></script>
+
+    <style>
+        html,
+        body,
+        #map {
             width: 100%;
             height: 100%;
             padding: 0;
             margin: 0;
         }
-        </style>
-        <title></title>
-    </head>
-    <body>
-        <div id="map">
-        </div>
-        <script src="js/qgis2web_expressions.js"></script>
-        <script src="js/leaflet.js"></script>
-        <script src="js/L.Control.Layers.Tree.min.js"></script>
-        <script src="js/L.Control.Locate.min.js"></script>
-        <script src="js/leaflet.rotatedMarker.js"></script>
-        <script src="js/leaflet.pattern.js"></script>
-        <script src="js/leaflet-hash.js"></script>
-        <script src="js/Autolinker.min.js"></script>
-        <script src="js/rbush.min.js"></script>
-        <script src="js/labelgun.min.js"></script>
-        <script src="js/labels.js"></script>
-        <script src="js/leaflet-measure.js"></script>
-        <script src="js/proj4.js"></script>
-        <script src="js/proj4leaflet.js"></script>
-        <script src="data/lines_001_2.js"></script>
-        <script src="data/points_001_3.js"></script>
-        <script>
+    </style>
+    <title></title>
+</head>
+
+<body>
+    <div id="map">
+    </div>
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+    <script src="js/proj4.js"></script>
+    <script src="js/proj4leaflet.js"></script>
+    <script src="data/lines_001_2.js"></script>
+    <script src="data/points_001_3.js"></script>
+    <script>
         var highlightLayer;
+
         function highlightFeature(e) {
             highlightLayer = e.target;
 
             if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
-              highlightLayer.setStyle({
-                color: '#ffff00',
-              });
+                highlightLayer.setStyle({
+                    color: '#ffff00',
+                });
             } else {
-              highlightLayer.setStyle({
-                fillColor: '#ffff00',
-                fillOpacity: 1
-              });
+                highlightLayer.setStyle({
+                    fillColor: '#ffff00',
+                    fillOpacity: 1
+                });
             }
         }
-        var crs = new L.Proj.CRS('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs', {
-            resolutions: [2800, 1400, 700, 350, 175, 84, 42, 21, 11.2, 5.6, 2.8, 1.4, 0.7, 0.35, 0.14, 0.07],
-        });
+
         var map = L.map('map', {
-            crs: crs,
-            continuousWorld: false,
-            worldCopyJump: false, 
-            zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[37.086336068692844,-122.87117798537768],[38.437054375691616,-119.82370555056556]]);
+            zoomControl: true,
+            maxZoom: 28,
+            minZoom: 1
+        }).fitBounds([[37.73445204624356, -122.51245024530328], [37.741351932891874, -122.49382455659455]]);
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
-        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-        // remove popup's row if "visible-with-data"
-        function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div');
-         tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                 rows[i].parentNode.removeChild(rows[i]);
-             }
-         }
-         return tempDiv.innerHTML;
-        }
-        // add class to format popup if it contains media
-		function addClassToPopupIfMedia(content, popup) {
-			var tempDiv = document.createElement('div');
-			tempDiv.innerHTML = content;
-			if (tempDiv.querySelector('td img')) {
-				popup._contentNode.classList.add('media');
-					// Delay to force the redraw
-					setTimeout(function() {
-						popup.update();
-					}, 10);
-			} else {
-				popup._contentNode.classList.remove('media');
-			}
-		}
-        var zoomControl = L.control.zoom({
-            position: 'topleft'
+
+        map.attributionControl.setPrefix('The accuracy of information presented on this map is not guaranteed. Consult City Representative for official documentation.');
+
+        var autolinker = new Autolinker({
+            truncate: {
+                length: 30,
+                location: 'smart'
+            }
+        });
+        L.control.locate({
+            locateOptions: {
+                maxZoom: 28
+            }
         }).addTo(map);
-        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+
+
+        // var crs = new L.Proj.CRS('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs', {
+        //     resolutions: [2800, 1400, 700, 350, 175, 84, 42, 21, 11.2, 5.6, 2.8, 1.4, 0.7, 0.35, 0.14, 0.07],
+        // });
+
+        // var map = L.map('map', {
+        //     crs: crs,
+        //     continuousWorld: false,
+        //     worldCopyJump: false,
+        //     zoomControl: false,
+        //     maxZoom: 5,
+        //     minZoom: 1
+        // }).fitBounds([[37.086336068692844, -122.87117798537768], [38.437054375691616, -119.82370555056556]]);
+        // var hash = new L.Hash(map);
+        // map.attributionControl.setPrefix('');
+        // var autolinker = new Autolinker({
+        //     truncate: {
+        //         length: 30,
+        //         location: 'smart'
+        //     }
+        // });
+        // remove popup's row if "visible-with-data"
+        // function removeEmptyRowsFromPopupContent(content, feature) {
+        //     var tempDiv = document.createElement('div');
+        //     tempDiv.innerHTML = content;
+        //     var rows = tempDiv.querySelectorAll('tr');
+        //     for (var i = 0; i < rows.length; i++) {
+        //         var td = rows[i].querySelector('td.visible-with-data');
+        //         var key = td ? td.id : '';
+        //         if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+        //             rows[i].parentNode.removeChild(rows[i]);
+        //         }
+        //     }
+        //     return tempDiv.innerHTML;
+        // }
+        // add class to format popup if it contains media
+        // function addClassToPopupIfMedia(content, popup) {
+        //     var tempDiv = document.createElement('div');
+        //     tempDiv.innerHTML = content;
+        //     if (tempDiv.querySelector('td img')) {
+        //         popup._contentNode.classList.add('media');
+        //         // Delay to force the redraw
+        //         setTimeout(function () {
+        //             popup.update();
+        //         }, 10);
+        //     } else {
+        //         popup._contentNode.classList.remove('media');
+        //     }
+        // }
+        // var zoomControl = L.control.zoom({
+        //     position: 'topleft'
+        // }).addTo(map);
+
+        L.control.locate({
+            locateOptions: {
+                maxZoom: 28
+            }
+        }).addTo(map);
         var measureControl = new L.Control.Measure({
             position: 'topleft',
             primaryLengthUnit: 'feet',
@@ -112,37 +180,12 @@
         document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
         document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
         var bounds_group = new L.featureGroup([]);
-        function setBounds() {
-        }
-        map.createPane('pane_OpenStreetMap_0');
-        map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
-        var layer_OpenStreetMap_0 = L.tileLayer('https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
-            pane: 'pane_OpenStreetMap_0',
-            opacity: 1.0,
-            attribution: '',
-            minZoom: 1,
-            maxZoom: 28,
-            minNativeZoom: 0,
-            maxNativeZoom: 19
-        });
-        layer_OpenStreetMap_0;
-        map.addLayer(layer_OpenStreetMap_0);
-        map.createPane('pane_OpenStreetMap_1');
-        map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
-        var layer_OpenStreetMap_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
-            pane: 'pane_OpenStreetMap_1',
-            opacity: 1.0,
-            attribution: '',
-            minZoom: 1,
-            maxZoom: 28,
-            minNativeZoom: 0,
-            maxNativeZoom: 19
-        });
-        layer_OpenStreetMap_1;
-        map.addLayer(layer_OpenStreetMap_1);
+
+        function setBounds() { }
+
         function pop_lines_001_2(feature, layer) {
             layer.on({
-                mouseout: function(e) {
+                mouseout: function (e) {
                     for (var i in e.target._eventParents) {
                         if (typeof e.target._eventParents[i].resetStyle === 'function') {
                             e.target._eventParents[i].resetStyle(e.target);
@@ -151,259 +194,282 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
-                    <tr>\
-                        <td colspan="2"><strong>desc</strong><br />' + (feature.properties['desc'] !== null ? autolinker.link(feature.properties['desc'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['level'] !== null ? autolinker.link(feature.properties['level'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                </table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, { maxHeight: 400 });
+            content = feature.properties.desc;
+            // var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+            // layer.on('popupopen', function (e) {
+            //     addClassToPopupIfMedia(content, e.popup);
+            // });
+            layer.bindPopup(content, {
+                maxHeight: 400
+            });
         }
 
+
+
+
         function style_lines_001_2_0(feature) {
-            switch(String(feature.properties['concat("level","desc")'])) {
-                case '101Cherry-Holm Tunnel':
+            switch (String(feature.properties["desc"])) {
+                case 'Cherry-Holm Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(247,251,255,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        //color: 'rgba(247,251,255,1.0)',
+                        color: 'rgba(203,222,241,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '102Holm Tunnel':
+                case 'Holm Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(236,244,251,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        //color: 'rgba(236,244,251,1.0)',
+                        color: 'rgba(203,222,241,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '103Canyon Power Tunnel':
+                case 'Canyon Power Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(224,237,248,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        //color: 'rgba(224,237,248,1.0)',
+                        color: 'rgba(203,222,241,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '104Kirkwood Tunnel':
+                case 'Kirkwood Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(213,229,244,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        //color: 'rgba(213,229,244,1.0)',
+                        color: 'rgba(203,222,241,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '105Mountain Tunnel':
+                case 'Mountain Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(203,222,241,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(203,222,241,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '106Foothill Tunnel':
+                case 'Foothill Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(188,215,235,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(188,215,235,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '107San Joaquin Pipeline 4 East - A':
+                case 'San Joaquin Pipeline 4 East - A':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(169,207,229,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(169,207,229,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '108San Joaquin Pipelines':
+                case 'San Joaquin Pipelines':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(149,197,223,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(149,197,223,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '109San Joaquin Pipeline 4 West':
+                case 'San Joaquin Pipeline 4 West':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(126,185,218,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(126,185,218,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '110Coast Range Tunnel':
+                case 'Coast Range Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(104,172,213,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(104,172,213,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '111Bay Division Pipelines 1, 2 and 5':
+                case 'Bay Division Pipelines 1, 2 and 5':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(85,159,206,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(85,159,206,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '111Bay Division Pipelines 3 and 4':
+                case 'Bay Division Pipelines 3 and 4':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(67,147,198,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(67,147,198,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '112Pulgas Tunnel':
+                case 'Pulgas Tunnel':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(52,132,191,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(52,132,191,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '113Bay Division Pipelines':
+                case 'Bay Division Pipelines':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(37,117,183,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(37,117,183,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '114Sunset Supply Pipeline':
+                case 'Sunset Supply Pipeline':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(24,101,172,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(24,101,172,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '115Sunset Supply Pipeline':
+                case 'Sunset Supply Pipeline':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(12,86,160,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(12,86,160,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
-                case '116Crystal Springs Pipelines 1 and 2':
+                case 'Crystal Springs Pipelines 1 and 2':
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(8,67,136,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(8,67,136,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
                 default:
                     return {
-                pane: 'pane_lines_001_2',
-                opacity: 1,
-                color: 'rgba(8,48,107,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
+                        pane: 'pane_lines_001_2',
+                        opacity: 1,
+                        color: 'rgba(8,48,107,1.0)',
+                        dashArray: '',
+                        lineCap: 'square',
+                        lineJoin: 'bevel',
+                        weight: 4.0,
+                        fillOpacity: 0,
+                        interactive: true,
+                    }
                     break;
             }
         }
+
+
+
+
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 1;
+
+        var layer_OSMStandard_0 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+            pane: 'pane_OSMStandard_0',
+            opacity: 0.5,
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 28
+        });
+
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+
+
         map.createPane('pane_lines_001_2');
         map.getPane('pane_lines_001_2').style.zIndex = 402;
         map.getPane('pane_lines_001_2').style['mix-blend-mode'] = 'normal';
@@ -418,9 +484,10 @@
         });
         bounds_group.addLayer(layer_lines_001_2);
         map.addLayer(layer_lines_001_2);
+
         function pop_points_001_3(feature, layer) {
             layer.on({
-                mouseout: function(e) {
+                mouseout: function (e) {
                     for (var i in e.target._eventParents) {
                         if (typeof e.target._eventParents[i].resetStyle === 'function') {
                             e.target._eventParents[i].resetStyle(e.target);
@@ -429,16 +496,14 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
-                    <tr>\
-                        <td colspan="2"><strong>desc</strong><br />' + (feature.properties['desc'] !== null ? autolinker.link(feature.properties['desc'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                </table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, { maxHeight: 400 });
+            var content = feature.properties.desc;
+            //var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+            // layer.on('popupopen', function (e) {
+            //     addClassToPopupIfMedia(content, e.popup);
+            // });
+            layer.bindPopup(content, {
+                maxHeight: 400
+            });
         }
 
         function style_points_001_3_0() {
@@ -478,22 +543,46 @@
         bounds_group.addLayer(layer_points_001_3);
         map.addLayer(layer_points_001_3);
         var baseMaps = {};
-        var overlaysTree = [
-            {label: '<img src="legend/points_001_3.png" /> points_001', layer: layer_points_001_3},
-            {label: 'lines_001<br /><table><tr><td style="text-align: center;"><img src="legend/lines_001_2_101CherryHolmTunnel0.png" /></td><td>101Cherry-Holm Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_102HolmTunnel1.png" /></td><td>102Holm Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_103CanyonPowerTunnel2.png" /></td><td>103Canyon Power Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_104KirkwoodTunnel3.png" /></td><td>104Kirkwood Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_105MountainTunnel4.png" /></td><td>105Mountain Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_106FoothillTunnel5.png" /></td><td>106Foothill Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_107SanJoaquinPipeline4EastA6.png" /></td><td>107San Joaquin Pipeline 4 East - A</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_108SanJoaquinPipelines7.png" /></td><td>108San Joaquin Pipelines</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_109SanJoaquinPipeline4West8.png" /></td><td>109San Joaquin Pipeline 4 West</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_110CoastRangeTunnel9.png" /></td><td>110Coast Range Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_111BayDivisionPipelines12and510.png" /></td><td>111Bay Division Pipelines 1, 2 and 5</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_111BayDivisionPipelines3and411.png" /></td><td>111Bay Division Pipelines 3 and 4</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_112PulgasTunnel12.png" /></td><td>112Pulgas Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_113BayDivisionPipelines13.png" /></td><td>113Bay Division Pipelines</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_114SunsetSupplyPipeline14.png" /></td><td>114Sunset Supply Pipeline</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_115SunsetSupplyPipeline15.png" /></td><td>115Sunset Supply Pipeline</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_116CrystalSpringsPipelines1and216.png" /></td><td>116Crystal Springs Pipelines 1 and 2</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_17.png" /></td><td></td></tr></table>', layer: layer_lines_001_2},
-            {label: "OpenStreetMap", layer: layer_OpenStreetMap_1},
-            {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},]
-        var lay = L.control.layers.tree(null, overlaysTree,{
-            //namedToggle: true,
-            //selectorBack: false,
-            //closedSymbol: '&#8862; &#x1f5c0;',
-            //openedSymbol: '&#8863; &#x1f5c1;',
-            //collapseAll: 'Collapse all',
-            //expandAll: 'Expand all',
-            collapsed: false, 
-        });
-        lay.addTo(map);
+
+
+
+        // var overlaysTree = [{
+        //     label: '<img src="legend/points_001_3.png" /> points_001',
+        //     layer: layer_points_001_3
+        // },
+        // {
+        //     label: 'lines_001<br /><table><tr><td style="text-align: center;"><img src="legend/lines_001_2_101CherryHolmTunnel0.png" /></td><td>101Cherry-Holm Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_102HolmTunnel1.png" /></td><td>102Holm Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_103CanyonPowerTunnel2.png" /></td><td>103Canyon Power Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_104KirkwoodTunnel3.png" /></td><td>104Kirkwood Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_105MountainTunnel4.png" /></td><td>105Mountain Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_106FoothillTunnel5.png" /></td><td>106Foothill Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_107SanJoaquinPipeline4EastA6.png" /></td><td>107San Joaquin Pipeline 4 East - A</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_108SanJoaquinPipelines7.png" /></td><td>108San Joaquin Pipelines</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_109SanJoaquinPipeline4West8.png" /></td><td>109San Joaquin Pipeline 4 West</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_110CoastRangeTunnel9.png" /></td><td>110Coast Range Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_111BayDivisionPipelines12and510.png" /></td><td>111Bay Division Pipelines 1, 2 and 5</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_111BayDivisionPipelines3and411.png" /></td><td>111Bay Division Pipelines 3 and 4</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_112PulgasTunnel12.png" /></td><td>112Pulgas Tunnel</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_113BayDivisionPipelines13.png" /></td><td>113Bay Division Pipelines</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_114SunsetSupplyPipeline14.png" /></td><td>114Sunset Supply Pipeline</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_115SunsetSupplyPipeline15.png" /></td><td>115Sunset Supply Pipeline</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_116CrystalSpringsPipelines1and216.png" /></td><td>116Crystal Springs Pipelines 1 and 2</td></tr><tr><td style="text-align: center;"><img src="legend/lines_001_2_17.png" /></td><td></td></tr></table>',
+        //     layer: layer_lines_001_2
+        // },
+        // {
+        //     label: "OpenStreetMap",
+        //     layer: layer_OpenStreetMap_0
+        // },
+        // ]
+        // var lay = L.control.layers.tree(null, overlaysTree, {
+        //namedToggle: true,
+        //selectorBack: false,
+        //closedSymbol: '&#8862; &#x1f5c0;',
+        //openedSymbol: '&#8863; &#x1f5c1;',
+        //collapseAll: 'Collapse all',
+        //expandAll: 'Expand all',
+        //     collapsed: false,
+        // });
+        //lay.addTo(map);
         setBounds();
-        </script>
-    </body>
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+
+</body>
+
 </html>
